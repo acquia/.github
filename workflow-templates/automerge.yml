@@ -1,0 +1,13 @@
+name: Auto-merge dependency updates
+on:
+  workflow_run:
+    types:
+      - "completed"
+    workflows:
+      - "CI"
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  automerge:
+    uses: acquia/.github/.github/workflows/automerge.yml@main

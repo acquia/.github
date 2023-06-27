@@ -1,0 +1,11 @@
+name: Sync GitHub issues to Jira
+on:
+  issues:
+    types:
+      - opened
+      - closed
+permissions:
+  issues: write
+jobs:
+  jira:
+    uses: acquia/.github/.github/workflows/automerge.yml@main

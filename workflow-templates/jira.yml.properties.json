@@ -1,0 +1,4 @@
+{
+    "name": "Sync GitHub issues to Jira",
+    "description": "Automatically sync new GitHub issues to Jira"
+}
