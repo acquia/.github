@@ -1,13 +1,16 @@
 name: Auto-label pull requests
 on:
   workflow_call:
+    secrets:
+      token:
+        required: true
 jobs:
   autolabel:
     runs-on: ubuntu-22.04
     permissions:
       pull-requests: write
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.token }}
       GITHUB_PR: ${{ github.event.pull_request.number }}
       GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
     steps:
@@ -46,5 +49,5 @@ jobs:
     steps:
       - run: gh pr view --json labels https://github.com/$GITHUB_REPOSITORY/pull/$GITHUB_PR | jq -r '.labels[0].name' | grep -q 'null' && echo "You must apply at least one label" && exit 1 || exit 0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.token }}
           GITHUB_PR: ${{ github.event.pull_request.number }}

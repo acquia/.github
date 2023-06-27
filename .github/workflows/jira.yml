@@ -1,6 +1,14 @@
 name: Sync GitHub issues to Jira
 on:
   workflow_call:
+    secrets:
+      jira-base-url:
+        required: true
+      jira-api-token:
+        required: true
+      github-token:
+        required: true
+
 jobs:
   open:
     if: github.event.action == 'opened'
@@ -12,8 +20,8 @@ jobs:
     - name: Login
       uses: acquia/gajira-login@bearer
       env:
-        JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
-        JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        JIRA_BASE_URL: ${{ secrets.jira-base-url }}
+        JIRA_API_TOKEN: ${{ secrets.jira-api-token }}
     - name: Set issue type
       id: issue_type
       run: |
@@ -50,7 +58,7 @@ jobs:
     - name: Update Github issue with Jira ticket prefix
       run: 'gh issue edit $GH_ISSUE --title "$JIRA_ISSUE: $ISSUE_TITLE"'
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.github-token }}
         GH_ISSUE: ${{ github.event.issue.html_url }}
         JIRA_ISSUE: ${{ steps.create.outputs.issue }}
         ISSUE_TITLE: ${{ github.event.issue.title }}
@@ -80,8 +88,8 @@ jobs:
         if: steps.get-issue.outputs.issue
         uses: acquia/gajira-login@bearer
         env:
-          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
-          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_BASE_URL: ${{ secrets.jira-base-url }}
+          JIRA_API_TOKEN: ${{ secrets.jira-api-token }}
       - name: Comment
         if: steps.get-issue.outputs.issue
         uses: acquia/gajira-comment@bearer

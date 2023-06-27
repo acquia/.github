@@ -1,6 +1,9 @@
 name: Auto-merge dependency updates
 on:
   workflow_call:
+    secrets:
+      github-token:
+        required: true
 jobs:
   merge:
     runs-on: ubuntu-22.04
@@ -16,9 +19,9 @@ jobs:
       uses: potiuk/get-workflow-origin@v1_5
       id: source-run-info
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.github-token }}
         sourceRunId: ${{ github.event.workflow_run.id }}
     - run: 'gh pr merge --auto --squash https://github.com/$GITHUB_REPOSITORY/pull/$GITHUB_PR'
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.github-token }}
         GITHUB_PR: ${{ steps.source-run-info.outputs.pullRequestNumber }}
