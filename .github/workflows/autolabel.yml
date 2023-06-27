@@ -2,7 +2,7 @@ name: Auto-label pull requests
 on:
   workflow_call:
     secrets:
-      token:
+      github-token:
         required: true
 jobs:
   autolabel:
