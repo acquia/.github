@@ -1,0 +1,4 @@
+{
+    "name": "Auto-label pull requests",
+    "description": "Automatically label pull requests based on linked issue labels"
+}

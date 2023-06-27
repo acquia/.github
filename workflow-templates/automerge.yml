@@ -1,0 +1,18 @@
+# This workflow automatically merges dependency updates provided by dependabot.
+# It will run whenever the workflow defined below passes and branch protection rules are satisfied.
+name: Auto-merge dependency updates
+on:
+  workflow_run:
+    types:
+      - "completed"
+    # Update this to match the name of your CI workflow, which must pass before updates are merged.
+    workflows:
+      - "CI"
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  automerge:
+    uses: acquia/.github/.github/workflows/automerge.yml@main
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}

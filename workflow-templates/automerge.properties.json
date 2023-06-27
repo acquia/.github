@@ -1,0 +1,4 @@
+{
+    "name": "Auto-merge dependency updates",
+    "description": "Automatically merge dependency updates from Dependabot"
+}
