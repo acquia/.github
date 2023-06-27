@@ -49,5 +49,5 @@ jobs:
     steps:
       - run: gh pr view --json labels https://github.com/$GITHUB_REPOSITORY/pull/$GITHUB_PR | jq -r '.labels[0].name' | grep -q 'null' && echo "You must apply at least one label" && exit 1 || exit 0
         env:
-          GITHUB_TOKEN: ${{ secrets.token }}
+          GITHUB_TOKEN: ${{ secrets.github-token }}
           GITHUB_PR: ${{ github.event.pull_request.number }}
