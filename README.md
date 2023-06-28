@@ -1,22 +1,15 @@
-# My repository name
+# .github
 
-[Acquia CI/CD Build Status]
+Default [community health](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file), policy, and [workflow](https://docs.github.com/en/actions/using-workflows/using-starter-workflows) files for the Acquia organization on GitHub
 
-[SonarQube Status Badge]
+## How to use
 
-## About this repository
+### Community health files
 
-Explain your repository.
+Community health files include files such as SUPPORT.md and issue templates. If a repository does not declare community health files of its own, the default versions from this repository will be used.
 
-## Testing and Build (CI)
+### Starter workflows
 
-Proper testing is required in the pipeline.yaml and during deployments, in order to release
-the application with reliability and be less prone to failures: 
+Public repositories in Acquia organization may use GitHub Actions. This repository provides starter workflows to support common use cases such as auto-merging dependencies, auto-labeling issues, and syncing GitHub issues with Jira. It also stores the canonical versions of the reuseable workflows used by the starter workflows.
 
-- All categories should have **unit tests** when code is being developed and, [lint helm charts](https://helm.sh/docs/helm/helm_lint), during pull requests.
-- For categories 2, 3 and 4, [**postsync hook tests**](https://argo-cd.readthedocs.io/en/stable/user-guide/resource_hooks)
-  are strongly advisable or even mandatory if the application can impact customers.
-
-## Releasing and Deploying (CD)
-
-A repository using CI+CD releases via ACD and follows the [Standard Release Process](https://github.com/acquia/acd/tree/master/docs/consumer_releases#standard-release-process)
+Follow the [instructions to use starter workflows](https://docs.github.com/en/actions/using-workflows/using-starter-workflows#using-starter-workflows). Follow instructions in the workflows themselves to customize them for your project.
