@@ -4,6 +4,10 @@ on:
     secrets:
       github-token:
         required: true
+      jira-base-url:
+        required: false
+      jira-api-token:
+        required: false
 jobs:
   autolabel:
     runs-on: ubuntu-22.04
@@ -16,7 +20,7 @@ jobs:
     steps:
       - name: Get linked issue label
         run: |
-          ISSUE_LABEL=$(gh api graphql -F owner=$GITHUB_REPOSITORY_OWNER -F name=$GITHUB_REPOSITORY_NAME -F number=$GITHUB_PR -f query='
+          LABEL=$(gh api graphql -F owner=$GITHUB_REPOSITORY_OWNER -F name=$GITHUB_REPOSITORY_NAME -F number=$GITHUB_PR -f query='
             query($owner:String!, $name:String!, $number:Int!){
               repository(owner:$owner, name:$name) {
                 pullRequest(number:$number) {
@@ -37,10 +41,58 @@ jobs:
               }
             }
           ' --jq '.data.repository.pullRequest.closingIssuesReferences.edges.[].node.labels.edges.[].node.name')
-          echo "ISSUE_LABEL=$ISSUE_LABEL" >> $GITHUB_ENV
+          echo "LABEL=$LABEL" >> $GITHUB_ENV
+      - name: Get project key
+        id: project_key
+        if: env.LABEL == ''
+        env:
+          GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
+        run: |
+          echo "key=${GITHUB_REPOSITORY_NAME^^}" >> $GITHUB_OUTPUT
+      - name: Get Jira issue
+        id: get-issue
+        if: env.LABEL == ''
+        run: |
+          if [[ "$PR_TITLE" =~ ^($PROJECT_KEY-[0-9]+): ]]; then
+              echo "issue=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+          fi
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PROJECT_KEY: ${{ steps.project_key.outputs.key }}
+      - name: Login
+        if: steps.get-issue.outputs.issue
+        uses: acquia/gajira-login@bearer
+        env:
+          JIRA_BASE_URL: ${{ secrets.jira-base-url }}
+          JIRA_API_TOKEN: ${{ secrets.jira-api-token }}
+      - name: Get issue type
+        if: steps.get-issue.outputs.issue
+        uses: acquia/gajira-comment@bearer
+        with:
+          issue: ${{ steps.get-issue.outputs.issue }}
+          comment: The GitHub issue corresponding to this ticket has been closed
+      - name: Get label
+        id: issue_type
+        run: |
+          case $ISSUE_LABEL in
+            bug)
+              echo "type=Bug" >> $GITHUB_OUTPUT
+              ;;
+            enhancement)
+              echo "type=Story" >> $GITHUB_OUTPUT
+              ;;
+            support)
+              echo "type=Priority Support" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "type=Task" >> $GITHUB_OUTPUT
+              ;;
+            esac
+        env:
+          ISSUE_LABEL: ${{ github.event.issue.labels[0].name }}
       - name: Apply label
-        if: env.ISSUE_LABEL != ''
-        run: gh pr edit https://github.com/$GITHUB_REPOSITORY/pull/$GITHUB_PR --add-label "$ISSUE_LABEL"
+        if: env.LABEL != ''
+        run: gh pr edit https://github.com/$GITHUB_REPOSITORY/pull/$GITHUB_PR --add-label "$LABEL"
   require_label:
     runs-on: ubuntu-22.04
     permissions:
