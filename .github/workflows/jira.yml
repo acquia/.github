@@ -8,7 +8,10 @@ on:
         required: true
       github-token:
         required: true
-
+    inputs:
+      issue-label:
+        required: false
+        type: string
 jobs:
   open:
     if: github.event.action == 'opened'
@@ -55,6 +58,9 @@ jobs:
         issuetype: ${{ steps.issue_type.outputs.type }}
         summary: ${{ github.event.issue.title }}
         description: ${{ github.event.issue.html_url }}
+        fields: '{"labels": ["$ISSUE_LABEL"]}'
+      env:
+        ISSUE_LABEL: ${{ inputs.issue-label }}
     - name: Update Github issue with Jira ticket prefix
       run: 'gh issue edit $GH_ISSUE --title "$JIRA_ISSUE: $ISSUE_TITLE"'
       env:
