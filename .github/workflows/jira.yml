@@ -9,7 +9,7 @@ on:
       github-token:
         required: true
     inputs:
-      issue-label:
+      issue_label:
         required: false
         type: string
 jobs:
@@ -50,6 +50,10 @@ jobs:
         GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
       run: |
         echo "key=${GITHUB_REPOSITORY_NAME^^}" >> $GITHUB_OUTPUT
+    - name: Set fields
+      id: set_fields
+      run: |
+        echo "fields={\"labels\":[\"$INPUT_ISSUE_LABEL\"]}" >> $GITHUB_OUTPUT
     - name: Create
       id: create
       uses: acquia/gajira-create@bearer
@@ -58,9 +62,7 @@ jobs:
         issuetype: ${{ steps.issue_type.outputs.type }}
         summary: ${{ github.event.issue.title }}
         description: ${{ github.event.issue.html_url }}
-        fields: '{"labels": ["$ISSUE_LABEL"]}'
-      env:
-        ISSUE_LABEL: ${{ inputs.issue-label }}
+        fields: ${{ steps.set_fields.outputs.fields }}
     - name: Update Github issue with Jira ticket prefix
       run: 'gh issue edit $GH_ISSUE --title "$JIRA_ISSUE: $ISSUE_TITLE"'
       env:
