@@ -79,17 +79,16 @@ jobs:
     permissions:
       issues: write
     steps:
-      - name: Get Jira issue
-        id: get-issue
-        uses: atlassian/gajira-find-issue-key@v3
-        with:
-          string: ${{ github.event.issue.title }}
       - name: Login
-        if: steps.get-issue.outputs.issue
         uses: acquia/gajira-login@bearer
         env:
           JIRA_BASE_URL: ${{ secrets.jira-base-url }}
           JIRA_API_TOKEN: ${{ secrets.jira-api-token }}
+      - name: Get Jira issue
+        id: get-issue
+        uses: acquia/gajira-find-issue-key@bearer
+        with:
+          string: ${{ github.event.issue.title }}
       - name: Comment
         if: steps.get-issue.outputs.issue
         uses: acquia/gajira-comment@bearer
