@@ -79,21 +79,11 @@ jobs:
     permissions:
       issues: write
     steps:
-      - name: Get project key
-        id: project_key
-        env:
-          GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
-        run: |
-          echo "key=${GITHUB_REPOSITORY_NAME^^}" >> $GITHUB_OUTPUT
       - name: Get Jira issue
         id: get-issue
-        run: |
-          if [[ "$ISSUE_TITLE" =~ ^($PROJECT_KEY-[0-9]+): ]]; then
-              echo "issue=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
-          fi
-        env:
-          ISSUE_TITLE: ${{ github.event.issue.title }}
-          PROJECT_KEY: ${{ steps.project_key.outputs.key }}
+        uses: atlassian/gajira-find-issue-key@v3
+        with:
+          string: ${{ github.event.issue.title }}
       - name: Login
         if: steps.get-issue.outputs.issue
         uses: acquia/gajira-login@bearer
