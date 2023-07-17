@@ -1,4 +1,4 @@
-![Acquia is the Open Source Digital Experience Company](../images/acquia.jpeg)
+![Acquia is the Open Source Digital Experience Company](https://github.com/acquia/.github/blob/main/images/acquia.jpeg)
 
 # Open Source at Acquia
 
