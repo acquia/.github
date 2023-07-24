@@ -4,6 +4,9 @@ on:
     secrets:
       jira-base-url:
         required: true
+      # User email will be needed for Jira Cloud, but does nothing currently.
+      jira-user-email:
+        required: false
       jira-api-token:
         required: true
       github-token:
