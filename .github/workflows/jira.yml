@@ -2,8 +2,9 @@ name: Sync GitHub issues to Jira
 on:
   workflow_call:
     secrets:
+      # Base URL is deprecated, now provided as org variable.
       jira-base-url:
-        required: true
+        required: false
       # User email will be needed for Jira Cloud, but does nothing currently.
       jira-user-email:
         required: false
@@ -26,7 +27,7 @@ jobs:
     - name: Login
       uses: acquia/gajira-login@bearer
       env:
-        JIRA_BASE_URL: ${{ secrets.jira-base-url }}
+        JIRA_BASE_URL: ${{ vars.JIRA_BASE_URL }}
         JIRA_API_TOKEN: ${{ secrets.jira-api-token }}
     - name: Set issue type
       id: issue_type
@@ -85,7 +86,7 @@ jobs:
       - name: Login
         uses: acquia/gajira-login@bearer
         env:
-          JIRA_BASE_URL: ${{ secrets.jira-base-url }}
+          JIRA_BASE_URL: ${{ vars.JIRA_BASE_URL }}
           JIRA_API_TOKEN: ${{ secrets.jira-api-token }}
       - name: Get Jira issue
         id: get-issue
