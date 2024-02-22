@@ -67,8 +67,23 @@ jobs:
         project: ${{ steps.project_key.outputs.key }}
         issuetype: ${{ steps.issue_type.outputs.type }}
         summary: ${{ github.event.issue.title }}
-        description: ${{ github.event.issue.html_url }}
+        description: ${{ github.event.issue.body }}
         fields: ${{ steps.set_fields.outputs.fields }}
+    - name: Add web link
+      id: link
+      run: |
+        curl --request POST \
+        --url "$JIRA_BASE_URL/rest/api/3/issue/$JIRA_ISSUE/remotelink" \
+        --data '{"object": {"url":"'"$GH_ISSUE"'","title":"'"$GH_ISSUE"'"}}' \
+        --user "$JIRA_USER_EMAIL:$JIRA_API_TOKEN" \
+        --header 'Accept: application/json' \
+        --header 'Content-Type: application/json'
+      env:
+        JIRA_BASE_URL: ${{ vars.JIRA_BASE_URL }}
+        JIRA_API_TOKEN: ${{ secrets.jira-api-token }}
+        JIRA_USER_EMAIL: ${{ secrets.jira-user-email }}
+        JIRA_ISSUE: ${{ steps.create.outputs.issue }}
+        GH_ISSUE: ${{ github.event.issue.html_url }}
     - name: Update Github issue with Jira ticket prefix
       run: 'gh issue edit $GH_ISSUE --title "$JIRA_ISSUE: $ISSUE_TITLE"'
       env:
