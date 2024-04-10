@@ -16,8 +16,8 @@ on:
         required: false
         type: string
 jobs:
-  open:
-    if: github.event.action == 'opened'
+  open-issue:
+    if: github.event.action == 'opened' && !github.event.pull_request
     runs-on: ubuntu-22.04
     name: Create new tickets in Jira
     permissions:
@@ -91,8 +91,8 @@ jobs:
         GH_ISSUE: ${{ github.event.issue.html_url }}
         JIRA_ISSUE: ${{ steps.create.outputs.issue }}
         ISSUE_TITLE: ${{ github.event.issue.title }}
-  close:
-    if: github.event.action == 'closed'
+  close-issue:
+    if: github.event.action == 'closed' && !github.event.pull_request
     runs-on: ubuntu-22.04
     name: Comment in Jira
     permissions:
@@ -115,3 +115,37 @@ jobs:
         with:
           issue: ${{ steps.get-issue.outputs.issue }}
           comment: The GitHub issue corresponding to this ticket has been closed
+  open-pr:
+    if: github.event.pull_request
+    runs-on: ubuntu-22.04
+    name: Link PR to Jira issue
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Login
+        uses: acquia/gajira-login@master
+        env:
+          JIRA_BASE_URL: ${{ vars.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.jira-user-email }}
+          JIRA_API_TOKEN: ${{ secrets.jira-api-token }}
+      - name: Get Jira issue
+        id: get-issue
+        uses: acquia/gajira-find-issue-key@master
+        with:
+          string: ${{ github.event.pull_request.title }}
+      - name: Add web link
+        if: steps.get-issue.outputs.issue
+        id: link
+        run: |
+          curl --request POST \
+          --url "$JIRA_BASE_URL/rest/api/3/issue/$JIRA_ISSUE/remotelink" \
+          --data '{"object": {"url":"'"$GH_ISSUE"'","title":"'"$GH_ISSUE"'"}}' \
+          --user "$JIRA_USER_EMAIL:$JIRA_API_TOKEN" \
+          --header 'Accept: application/json' \
+          --header 'Content-Type: application/json'
+        env:
+          JIRA_BASE_URL: ${{ vars.JIRA_BASE_URL }}
+          JIRA_API_TOKEN: ${{ secrets.jira-api-token }}
+          JIRA_USER_EMAIL: ${{ secrets.jira-user-email }}
+          JIRA_ISSUE: ${{ steps.get-issue.outputs.issue }}
+          GH_ISSUE: ${{ github.event.pull_request.html_url }}
