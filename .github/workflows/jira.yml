@@ -116,7 +116,6 @@ jobs:
           issue: ${{ steps.get-issue.outputs.issue }}
           comment: The GitHub issue corresponding to this ticket has been closed
   open-pr:
-    if: github.event.issue.pull_request
     runs-on: ubuntu-22.04
     name: Link PR to Jira issue
     permissions:
