@@ -17,7 +17,7 @@ on:
         type: string
 jobs:
   open-issue:
-    if: github.event.action == 'opened' && !github.event.issue.pull_request
+    if: github.event.action == 'opened' && !github.event.pull_request
     runs-on: ubuntu-22.04
     name: Create new tickets in Jira
     permissions:
@@ -92,7 +92,7 @@ jobs:
         JIRA_ISSUE: ${{ steps.create.outputs.issue }}
         ISSUE_TITLE: ${{ github.event.issue.title }}
   close-issue:
-    if: github.event.action == 'closed' && !github.event.issue.pull_request
+    if: github.event.action == 'closed' && !github.event.pull_request
     runs-on: ubuntu-22.04
     name: Comment in Jira
     permissions:
@@ -116,6 +116,7 @@ jobs:
           issue: ${{ steps.get-issue.outputs.issue }}
           comment: The GitHub issue corresponding to this ticket has been closed
   open-pr:
+    if: github.event.pull_request
     runs-on: ubuntu-22.04
     name: Link PR to Jira issue
     permissions:
