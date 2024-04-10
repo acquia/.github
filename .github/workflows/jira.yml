@@ -132,7 +132,7 @@ jobs:
         id: get-issue
         uses: acquia/gajira-find-issue-key@master
         with:
-          string: ${{ github.event.issue.title }}
+          string: ${{ github.event.pull_request.title }}
       - name: Add web link
         if: steps.get-issue.outputs.issue
         id: link
@@ -148,4 +148,4 @@ jobs:
           JIRA_API_TOKEN: ${{ secrets.jira-api-token }}
           JIRA_USER_EMAIL: ${{ secrets.jira-user-email }}
           JIRA_ISSUE: ${{ steps.get-issue.outputs.issue }}
-          GH_ISSUE: ${{ github.event.issue.html_url }}
+          GH_ISSUE: ${{ github.event.pull_request.html_url }}
