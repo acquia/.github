@@ -130,6 +130,7 @@ jobs:
           JIRA_API_TOKEN: ${{ secrets.jira-api-token }}
       - name: Get Jira issue
         id: get-issue
+        continue-on-error: true
         uses: acquia/gajira-find-issue-key@master
         with:
           string: ${{ github.event.pull_request.title }}
