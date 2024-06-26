@@ -12,6 +12,9 @@ on:
       github-token:
         required: true
     inputs:
+      project_key:
+        required: true
+        type: string
       issue_label:
         required: false
         type: string
@@ -48,12 +51,6 @@ jobs:
           esac
       env:
         ISSUE_LABEL: ${{ github.event.issue.labels[0].name }}
-    - name: Get project key
-      id: project_key
-      env:
-        GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
-      run: |
-        echo "key=${GITHUB_REPOSITORY_NAME^^}" >> $GITHUB_OUTPUT
     - name: Set fields
       id: set_fields
       run: |
@@ -64,7 +61,7 @@ jobs:
       id: create
       uses: atlassian/gajira-create@v3
       with:
-        project: ${{ steps.project_key.outputs.key }}
+        project: ${{ inputs.project_key }}
         issuetype: ${{ steps.issue_type.outputs.type }}
         summary: ${{ github.event.issue.title }}
         description: ${{ github.event.issue.body }}
